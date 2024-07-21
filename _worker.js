@@ -4,7 +4,6 @@
 // https://github.com/bia-pain-bache/BPB-Worker-Panel
 
 import { connect } from 'cloudflare:sockets';
-
 // How to generate your own UUID:
 // https://www.uuidgenerator.net/
 let userID = 'c3690fc5-b220-a32c-33bf-b66e00a7b39a';

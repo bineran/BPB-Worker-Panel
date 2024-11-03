@@ -46,8 +46,7 @@ export default {
                 const searchParams = new URLSearchParams(url.search);
                 const host = request.headers.get('Host');
                 const client = searchParams.get('app');
-		let pathname=url.pathname;
-                switch (pathname) {
+                switch (url.pathname) {
 
                     case '/cf':
                         return new Response(JSON.stringify(request.cf, null, 4), {
@@ -198,10 +197,7 @@ export default {
                         });
 
                     default:
-                        pathname = '/login'; 
-        		continue;
-                    
-                        /** return new Response('Not found', { status: 404 }); */
+                         return new Response('Not found', { status: 404 }); 
                 }
             } else {
                 return await vlessOverWSHandler(request);

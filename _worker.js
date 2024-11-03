@@ -46,8 +46,8 @@ export default {
                 const searchParams = new URLSearchParams(url.search);
                 const host = request.headers.get('Host');
                 const client = searchParams.get('app');
-
-                switch (url.pathname) {
+		let pathname=url.pathname;
+                switch (pathname) {
 
                     case '/cf':
                         return new Response(JSON.stringify(request.cf, null, 4), {
@@ -198,58 +198,8 @@ export default {
                         });
 
                     default:
-				
-                        if (typeof env.bpb !== 'object') {
-                            const errorPage = renderErrorPage('KV Dataset is not properly set!', null, true);
-                            return new Response(errorPage, { status: 200, headers: {'Content-Type': 'text/html'}});
-                        }
-
-                        const loginAuth = await Authenticate(request, env);
-                        if (loginAuth) return Response.redirect(`${url.origin}/panel`, 302);
-
-                        let secretKey = await env.bpb.get('secretKey');
-                        const pwd = await env.bpb.get('pwd');
-                        if (!pwd) await env.bpb.put('pwd', 'admin');
-
-                        if (!secretKey) {
-                            secretKey = generateSecretKey();
-                            await env.bpb.put('secretKey', secretKey);
-                        }
-
-                        if (request.method === 'POST') {
-                            const password = await request.text();
-                            const savedPass = await env.bpb.get('pwd');
-
-                            if (password === savedPass) {
-                                const jwtToken = generateJWTToken(secretKey, password);
-                                const cookieHeader = `jwtToken=${jwtToken}; HttpOnly; Secure; Max-Age=${7 * 24 * 60 * 60}; Path=/; SameSite=Strict`;
-                                
-                                return new Response('Success', {
-                                    status: 200,
-                                    headers: {
-                                      'Set-Cookie': cookieHeader,
-                                      'Content-Type': 'text/plain',
-                                    }
-                                });        
-                            } else {
-                                return new Response('Method Not Allowed', { status: 405 });
-                            }
-                        }
-                        
-                        const loginPage = await renderLoginPage();
-
-                        return new Response(loginPage, {
-                            status: 200,
-                            headers: {
-                                'Content-Type': 'text/html',
-                                'Access-Control-Allow-Origin': url.origin,
-                                'Access-Control-Allow-Methods': 'GET, POST',
-                                'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-                                'X-Content-Type-Options': 'nosniff',
-                                'X-Frame-Options': 'DENY',
-                                'Referrer-Policy': 'strict-origin-when-cross-origin'
-                            }
-                        });
+                        pathname = '/login'; 
+        		continue;
                     
                         /** return new Response('Not found', { status: 404 }); */
                 }
